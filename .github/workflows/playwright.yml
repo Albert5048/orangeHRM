@@ -2,41 +2,51 @@ name: Playwright Tests
 
 on:
   push:
-    branches: [ main, master, E2E ]
+    branches: [main, master, E2E]
   pull_request:
-    branches: [ main, master, E2E ]
+    branches: [main, master, E2E]
+
+permissions:
+  contents: read
 
 jobs:
   test:
-    timeout-minutes: 60
+    name: Test with Playwright
     runs-on: ubuntu-latest
-    
+    timeout-minutes: 60
+
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: 20
-        cache: 'npm'
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
 
-    - name: Install Dependencies
-      run: npm ci
+      - name: Install project dependencies
+        run: npm ci
 
-    - name: Install Playwright Browsers
-      run: npx playwright install --with-deps
+      - name: Install Allure reporter and CLI
+        run: npm install --no-save --package-lock=false allure-playwright allure-cli
 
-    - name: Run Playwright Tests
-      run: npx playwright test
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
 
-    - name: Generate Allure HTML Report
-      run: npx allure generate allure-results --single-file -o allure-report
+      - name: Run Playwright tests
+        id: playwright
+        run: npx playwright test --reporter=allure
 
-    - name: Upload Allure HTML Report Artifact
-      uses: actions/upload-artifact@v4
-      if: ${{ !cancelled() }}
-      with:
-        name: allure-report-html
-        path: allure-report/index.html   
-        retention-days: 30
+      - name: Generate Allure HTML report
+        if: always()
+        run: npx allure generate allure-results --single-file -o allure-report
+
+      - name: Upload Allure HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report-html
+          path: allure-report/index.html
+          if-no-files-found: error
+          retention-days: 30
