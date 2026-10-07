@@ -28,14 +28,13 @@ jobs:
       - name: Install project dependencies
         run: npm ci
 
-      - name: Install Allure reporter and CLI
-        run: npm install --no-save --package-lock=false allure-playwright allure-cli @playwright/test
+      - name: Install Allure CLI locally
+        run: npm install --no-save --package-lock=false allure-cli allure-playwright
 
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
 
       - name: Run Playwright tests
-        id: playwright
         run: npx playwright test --reporter=allure
 
       - name: Generate Allure HTML report
@@ -45,7 +44,7 @@ jobs:
             echo "Allure results were not generated."
             exit 1
           fi
-          npx allure generate allure-results -o allure-report --single-file
+          npx allure generate allure-results -o allure-report
 
       - name: Upload Allure HTML report
         if: always()
