@@ -4,6 +4,10 @@ class UserFormPage {
     this.roleDropdown = page.locator('div.oxd-select-wrapper').first();
     this.statusDropdown = page.locator('div.oxd-select-wrapper').nth(1);
     this.employeeInput = page.locator('input[placeholder="Type for hints..."]');
+    this.employeeOptions = page
+      .getByRole('listbox')
+      .getByRole('option', { name: /John Doe/i })
+      .first();
     this.usernameInput = page.locator('.oxd-form input').nth(1);
     this.passwordInput = page.locator('input[type="password"]').nth(0);
     this.confirmPasswordInput = page.locator('input[type="password"]').nth(1);
@@ -17,7 +21,7 @@ class UserFormPage {
     await this.page.getByRole('option', { name: 'Enabled' }).click();
 
     await this.employeeInput.fill('John');
-    await this.page.getByRole('option', { name: /John Doe/i }).click();
+    await this.employeeOptions.click();
 
     const username = 'automationuser' + Date.now();
     await this.usernameInput.fill(username);
