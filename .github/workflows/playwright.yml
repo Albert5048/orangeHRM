@@ -28,29 +28,17 @@ jobs:
       - name: Install project dependencies
         run: npm ci
 
-      - name: Install Allure CLI locally
-        run: npm install --no-save --package-lock=false allure-cli allure-playwright
-
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
 
       - name: Run Playwright tests
-        run: npx playwright test --reporter=allure
+        run: npx playwright test --reporter=html
 
-      - name: Generate Allure HTML report
-        if: always()
-        run: |
-          if [[ ! -d allure-results ]]; then
-            echo "Allure results were not generated."
-            exit 1
-          fi
-          npx allure generate allure-results -o allure-report
-
-      - name: Upload Allure HTML report
+      - name: Upload Playwright HTML report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: allure-report-html
-          path: allure-report/index.html
+          name: playwright-report-html
+          path: playwright-report/index.html
           if-no-files-found: error
           retention-days: 30
